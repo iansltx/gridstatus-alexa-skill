@@ -97,7 +97,7 @@ logger.setLevel(logging.INFO)
 def _load_config() -> dict:
     table = ddb_resource.Table(ddb_table_name)
     response = table.get_item(Key={"id": "config"})
-    return response.get("Item", {}).get("attributes", {})
+    return response.get("Item", {})
 
 
 config = _load_config()
