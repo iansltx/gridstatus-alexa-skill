@@ -93,7 +93,6 @@ sb = CustomSkillBuilder(persistence_adapter=dynamodb_adapter)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-
 def _load_config() -> dict:
     table = ddb_resource.Table(ddb_table_name)
     response = table.get_item(Key={"id": "config"})
@@ -103,7 +102,6 @@ def _load_config() -> dict:
 config = _load_config()
 GRID_STATUS_API_KEY = config.get("api_key")
 grid_status_client = GridStatusClient(api_key=GRID_STATUS_API_KEY)
-
 
 @sb.request_handler(can_handle_func=is_request_type("LaunchRequest"))
 def launch_request_handler(handler_input):
