@@ -3,7 +3,6 @@
 import logging
 import os
 from datetime import datetime, timezone
-from http import GridStatusClient
 
 import boto3
 from ask_sdk_core.handler_input import HandlerInput
@@ -13,6 +12,7 @@ from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 from ask_sdk_model import Response
 
 import api
+from gridstatus_lite import GridStatusClient
 
 SKILL_NAME = "Grid Status"
 

@@ -115,7 +115,16 @@ FUEL_DISPLAY_NAMES = {
     "waste_disposal": "waste",
     "diesel_fuel_oil": "diesel",
     "pumped_storage": "pumped storage",
+    "battery_storage": "battery storage",
+    "petroleum": "petroleum",
+    "solar_with_integrated_battery_storage": "solar with battery storage",
+    "wind_with_integrated_battery_storage": "wind with battery storage",
+    "other_energy_storage": "other energy storage",
+    "unknown_energy_storage": "energy storage",
 }
+
+# Metadata columns in eia_fuel_mix_hourly that are not fuel types.
+_EIA_META_COLS: frozenset = frozenset({"respondent", "respondent_name"})
 
 
 def _to_utc_naive(dt):
@@ -202,7 +211,11 @@ def _query_fuel_mix_dataset(client, iso, dataset, target_time):
 
 def _query_eia_ba_fuel_mix(client, ba_code, target_time):
     """
-    Query the EIA grid monitor dataset for a specific Balancing Authority.
+    Query the EIA fuel mix hourly dataset for a specific Balancing Authority.
+
+    eia_fuel_mix_hourly is wide-format: one row per (respondent, hour) with
+    each fuel type as its own numeric column.  The former eia_grid_monitor
+    dataset (long-format, one row per fuel type) has been retired.
 
     Args:
         client: GridStatus API client
@@ -222,26 +235,26 @@ def _query_eia_ba_fuel_mix(client, ba_code, target_time):
     end_str = end.strftime("%Y-%m-%dT%H:%M:%S+00:00")
 
     logger.info(
-        "Querying eia_grid_monitor for BA %s between %s and %s",
+        "Querying eia_fuel_mix_hourly for BA %s between %s and %s",
         ba_code,
         start_str,
         end_str,
     )
 
     data = client.get_dataset(
-        dataset="eia_grid_monitor",
+        dataset="eia_fuel_mix_hourly",
         start=start_str,
         end=end_str,
-        filter_column="balancing_authority",
+        filter_column="respondent",
         filter_value=ba_code,
-        limit=100,
+        limit=20,
         return_format="python",
         verbose=False,
     )
 
     if not data:
         raise ValueError(
-            f"No data returned from eia_grid_monitor for Balancing Authority '{ba_code}'"
+            f"No data returned from eia_fuel_mix_hourly for Balancing Authority '{ba_code}'"
         )
 
     target_naive = _to_utc_naive(target_time)
@@ -255,32 +268,17 @@ def _query_eia_ba_fuel_mix(client, ba_code, target_time):
             return float("inf")
         return abs((interval_naive - target_naive).total_seconds())
 
-    min_distance = min(record_distance(r) for r in data)
-    closest_records = [r for r in data if record_distance(r) == min_distance]
+    closest = min(data, key=record_distance)
+    record_time = closest.get("interval_start_utc")
 
     fuel_mix = {}
-    record_time = None
-
-    for record in closest_records:
-        if record_time is None:
-            record_time = record.get("interval_start_utc")
-
-        fuel_type = record.get("fuel_type")
-        generation_mw = record.get("generation_mw")
-
-        if fuel_type is not None and generation_mw is not None:
-            if isinstance(generation_mw, (int, float)):
-                fuel_key = fuel_type.lower().replace(" ", "_").replace("-", "_")
-                fuel_mix[fuel_key] = fuel_mix.get(fuel_key, 0) + generation_mw
-        else:
-            # Fallback: extract all numeric non-metadata columns
-            for key, value in record.items():
-                if key in NON_FUEL_COLUMNS:
-                    continue
-                if key in ("balancing_authority", "fuel_type"):
-                    continue
-                if isinstance(value, (int, float)):
-                    fuel_mix[key] = fuel_mix.get(key, 0) + value
+    for key, value in closest.items():
+        if key in NON_FUEL_COLUMNS:
+            continue
+        if key in _EIA_META_COLS:
+            continue
+        if isinstance(value, (int, float)):
+            fuel_mix[key] = value
 
     if not fuel_mix:
         raise ValueError(
