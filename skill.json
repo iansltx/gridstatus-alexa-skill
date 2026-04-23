@@ -36,6 +36,7 @@
                         }
                     ],
                     "samples": [
+                        "Where is electricity in {iso} coming from right now",
                         "What was the fuel mix for {iso} on {date} at {time}",
                         "What is the fuel mix for {iso} right now",
                         "Where did electricity come from in {iso} on {date} at {time}",
