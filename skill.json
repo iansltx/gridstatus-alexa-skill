@@ -1,0 +1,578 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "grid status",
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "CurrentEnergyMix",
+                    "slots": [
+                        {
+                            "name": "iso",
+                            "type": "SystemOperator"
+                        },
+                        {
+                            "name": "time",
+                            "type": "AMAZON.TIME"
+                        },
+                        {
+                            "name": "date",
+                            "type": "AMAZON.DATE"
+                        }
+                    ],
+                    "samples": [
+                        "What was the fuel mix for {iso} on {date} at {time}",
+                        "What is the fuel mix for {iso} right now",
+                        "Where did electricity come from in {iso} on {date} at {time}",
+                        "What was the generation mix in {iso} {date} at {time} ",
+                        "What was the generation mix in {iso} at {time}",
+                        "Where is electricity for {iso} coming from right now",
+                        "What is the current generation mix in {iso} "
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "SystemOperator",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "IESO",
+                                "synonyms": [
+                                    "Ontario"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "ISONE",
+                                "synonyms": [
+                                    "New England"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "NYISO",
+                                "synonyms": [
+                                    "New York"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "MISO"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "PJM"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SPP"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "CAISO",
+                                "synonyms": [
+                                    "California"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "ERCOT",
+                                "synonyms": [
+                                    "Texas"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "AECI",
+                                "synonyms": [
+                                    "Associated Electric Cooperative"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "AVA",
+                                "synonyms": [
+                                    "Avista"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "AVRN",
+                                "synonyms": [
+                                    "Avangrid"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "AZPS",
+                                "synonyms": [
+                                    "Arizona Public Service Company",
+                                    "Arizona"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "BANC",
+                                "synonyms": [
+                                    "Balancing Authority of Northern California"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "BPAT",
+                                "synonyms": [
+                                    "Bonneville Power Administration",
+                                    "Bonneville"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "CHPD",
+                                "synonyms": [
+                                    "Public Utility District Number 1 of Chelan County"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "CPLE",
+                                "synonyms": [
+                                    "Duke Energy Progress East",
+                                    "Duke East"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "CPLW",
+                                "synonyms": [
+                                    "Duke Energy Progress West",
+                                    "Duke West"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "DEAA",
+                                "synonyms": [
+                                    "Arlington Valley"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "DOPD",
+                                "synonyms": [
+                                    "PUD Number 1 of Douglas County",
+                                    "Douglas County"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "DUK",
+                                "synonyms": [
+                                    "Duke Energy Carolinas",
+                                    "Duke Carolinas"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "EPE",
+                                "synonyms": [
+                                    "El Paso Electric Company",
+                                    "El Paso"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "FMPP",
+                                "synonyms": [
+                                    "Florida Municipal Power Pool"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "FPC",
+                                "synonyms": [
+                                    "Duke Energy Florida",
+                                    "Duke Florida"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "FPL",
+                                "synonyms": [
+                                    "Florida Power and Light"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "GCPD",
+                                "synonyms": [
+                                    "Public Utility District Number 2 of Grant County, Washington",
+                                    "Grant County"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "GRID",
+                                "synonyms": [
+                                    "Gridforce Energy Management",
+                                    "Gridforce"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "GVL",
+                                "synonyms": [
+                                    "Gainesville Regional Utilities",
+                                    "Gainesville"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "GWA",
+                                "synonyms": [
+                                    "NaturEner Power Watch"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "HST",
+                                "synonyms": [
+                                    "City of Homestead",
+                                    "Homestead"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "IID",
+                                "synonyms": [
+                                    "Imperial Irrigation District"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "IPCO",
+                                "synonyms": [
+                                    "Idaho Power Company",
+                                    "Idaho"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "JEA"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "LDWP",
+                                "synonyms": [
+                                    "Los Angeles Department of Water and Power",
+                                    "LA",
+                                    "Los Angeles"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "LGEE",
+                                "synonyms": [
+                                    "LG and E",
+                                    "Louisville"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "NEVP",
+                                "synonyms": [
+                                    "Nevada Power Company",
+                                    "Nevada"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "NWMT",
+                                "synonyms": [
+                                    "NorthWestern Corporation"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "PACE",
+                                "synonyms": [
+                                    "PacifiCorp East"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "PACW",
+                                "synonyms": [
+                                    "PacifiCorp West"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "PGE",
+                                "synonyms": [
+                                    "Portland General Electric Company",
+                                    "Portland"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "PNM",
+                                "synonyms": [
+                                    "Public Service Company of New Mexico",
+                                    "New Mexico"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "PSCO",
+                                "synonyms": [
+                                    "Public Service Company of Colorado",
+                                    "Colorado"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "PSEI",
+                                "synonyms": [
+                                    "Puget Sound Energy"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SC",
+                                "synonyms": [
+                                    "South Carolina Public Service Authority",
+                                    "South Carolina"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SCEG",
+                                "synonyms": [
+                                    "Dominion Energy South Carolina",
+                                    "Dominion South Carolina"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SCL",
+                                "synonyms": [
+                                    "Seattle City Light",
+                                    "Seattle"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SEC",
+                                "synonyms": [
+                                    "Seminole Electric Cooperative"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SEPA",
+                                "synonyms": [
+                                    "Southeastern Power Administration"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SIKE",
+                                "synonyms": [
+                                    "Sikeston Board of Municipal Utilities",
+                                    "Sikeston"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SOCO",
+                                "synonyms": [
+                                    "Southern Company"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SPA",
+                                "synonyms": [
+                                    "Southwestern Power Administration"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SRP",
+                                "synonyms": [
+                                    "Salt River Project"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "SWPP",
+                                "synonyms": [
+                                    "Southwest Power Pool"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "TAL",
+                                "synonyms": [
+                                    "Tallahassee"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "TEC",
+                                "synonyms": [
+                                    "Tampa"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "TEPC",
+                                "synonyms": [
+                                    "Tucson"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "TIDC",
+                                "synonyms": [
+                                    "Turlock"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "TPWR",
+                                "synonyms": [
+                                    "Tacoma"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "TVA",
+                                "synonyms": [
+                                    "Tennessee Valley Authority",
+                                    "Tennessee"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "WACM",
+                                "synonyms": [
+                                    "Western Area Power Administration, Rocky Mountain Region",
+                                    "WAPA Rockies"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "WALC",
+                                "synonyms": [
+                                    "Western Area Power Administration, Desert Southwest Region",
+                                    "WAPA Southwest"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "WAUW",
+                                "synonyms": [
+                                    "Western Area Power Administration, Upper Great Plains West",
+                                    "WAPA Great Plains"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "WWA",
+                                "synonyms": [
+                                    "NaturEner Wind Watch"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "YAD",
+                                "synonyms": [
+                                    "Alcoa"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
