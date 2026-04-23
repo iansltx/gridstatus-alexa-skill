@@ -287,7 +287,10 @@ def current_energy_mix_handler(handler_input):
 
     try:
         result = api.get_fuel_mix(grid_status_client, iso, target_time)
-        speech_text = api.format_fuel_mix_speech(result, iso_display)
+        is_current = time_str is None and date_str is None
+        speech_text = api.format_fuel_mix_speech(
+            result, iso_display, iso_tz=iso_tz, is_current=is_current
+        )
     except ValueError as e:
         logger.error("Fuel mix not available for %s: %s", iso, e)
         speech_text = (

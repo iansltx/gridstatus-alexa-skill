@@ -93,6 +93,82 @@ ISO_TIMEZONES: dict[str, str] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Friendly timezone names for speech output
+# ---------------------------------------------------------------------------
+# Maps IANA timezone IDs to human-friendly names suitable for Alexa speech.
+# America/Phoenix is "Arizona Time" because Arizona (outside Navajo Nation)
+# does not observe DST, making it distinctively different from Mountain Time.
+FRIENDLY_TZ_NAMES: dict[str, str] = {
+    "America/New_York": "Eastern Time",
+    "America/Toronto": "Eastern Time",
+    "America/Chicago": "Central Time",
+    "America/Denver": "Mountain Time",
+    "America/Boise": "Mountain Time",
+    "America/Phoenix": "Arizona Time",
+    "America/Los_Angeles": "Pacific Time",
+    "UTC": "UTC",
+}
+
+
+def _friendly_tz_name(iana_tz: str) -> str:
+    """Return a speech-friendly timezone label for an IANA timezone string.
+
+    If the IANA ID is not in ``FRIENDLY_TZ_NAMES``, derives a name by splitting
+    on ``/``, taking the second component, replacing underscores with spaces,
+    and appending `` Time``.  For example, ``America/New_York`` → ``New York Time``
+    and ``America/Los_Angeles`` → ``Los Angeles Time``.
+    """
+    if iana_tz in FRIENDLY_TZ_NAMES:
+        return FRIENDLY_TZ_NAMES[iana_tz]
+    parts = iana_tz.split("/")
+    if len(parts) >= 2:
+        return parts[1].replace("_", " ") + " Time"
+    return iana_tz + " Time"
+
+
+def _ordinal_suffix(day: int) -> str:
+    """Return the ordinal suffix for a day-of-month integer (1→'st', etc.)."""
+    if 11 <= day <= 13:
+        return "th"
+    return {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+
+
+def _format_local_time_for_speech(dt: datetime, iso_tz) -> str:
+    """
+    Convert a UTC-aware datetime to a speech-friendly string in *iso_tz*.
+
+    Returns a string like ``"3:45 PM Central Time on January 15th"``.
+
+    Args:
+        dt: A timezone-aware datetime (typically UTC).
+        iso_tz: A :class:`~zoneinfo.ZoneInfo` instance for the target timezone.
+
+    Returns:
+        A formatted string suitable for Alexa speech.
+    """
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=tz_module.utc)
+    local = dt.astimezone(iso_tz)
+
+    hour = local.hour % 12 or 12
+    minute = local.minute
+    am_pm = "AM" if local.hour < 12 else "PM"
+
+    if minute == 0:
+        time_part = f"{hour} {am_pm}"
+    else:
+        time_part = f"{hour}:{minute:02d} {am_pm}"
+
+    tz_label = _friendly_tz_name(getattr(iso_tz, "key", "UTC"))
+
+    day = local.day
+    month_name = local.strftime("%B")
+    date_part = f"{month_name} {day}{_ordinal_suffix(day)}"
+
+    return f"{time_part} {tz_label} on {date_part}"
+
+
 def get_iso_timezone(iso: str) -> ZoneInfo:
     """
     Return a :class:`~zoneinfo.ZoneInfo` for the given ISO or EIA-BA code.
@@ -444,13 +520,20 @@ def get_fuel_mix(client, iso, target_time):
     )
 
 
-def format_fuel_mix_speech(result, iso_display_name):
+def format_fuel_mix_speech(result, iso_display_name, iso_tz=None, is_current=True):
     """
     Format a fuel mix result dict into a human-readable Alexa speech string.
 
     Args:
-        result: dict with key 'fuel_mix' (dict mapping fuel type to MW)
-        iso_display_name: Human-readable name for the ISO/BA (e.g. "ERCOT")
+        result: dict with keys 'fuel_mix' (dict mapping fuel type to MW) and
+            'time' (a UTC-aware datetime for the data interval).
+        iso_display_name: Human-readable name for the ISO/BA (e.g. "ERCOT").
+        iso_tz: Optional :class:`~zoneinfo.ZoneInfo` for the grid operator's
+            local timezone.  Used to display the data timestamp in local time
+            when *is_current* is ``False``.
+        is_current: When ``True`` (default) the response says "right now".
+            When ``False`` the actual data date, time, and timezone are
+            included in the response.
 
     Returns:
         A speech string suitable for Alexa to read aloud.
@@ -495,4 +578,20 @@ def format_fuel_mix_speech(result, iso_display_name):
     else:
         mix_str = ", ".join(parts[:-1]) + f", and {parts[-1]}"
 
-    return f"The energy mix for {iso_display_name} is {mix_str}."
+    # Build the time context phrase and choose the appropriate verb tense.
+    if is_current:
+        time_context = "right now"
+        verb = "is"
+    else:
+        record_time = result.get("time")
+        if record_time is not None and iso_tz is not None:
+            time_label = _format_local_time_for_speech(record_time, iso_tz)
+            time_context = f"at {time_label}"
+        else:
+            time_context = None
+        verb = "was" if time_context else "is"
+
+    if time_context:
+        return f"The energy mix for {iso_display_name} {time_context} {verb} {mix_str}."
+    else:
+        return f"The energy mix for {iso_display_name} {verb} {mix_str}."
