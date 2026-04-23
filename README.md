@@ -26,3 +26,8 @@ foreach (array_slice($data, 1) as $row) {
 ```
 
 Then did some manual tweaks on top of that to match how someone might say the BA name.
+
+After setting up the intent/slot values, I switched over to building the Lambda function. Which, the first steps of building were nuking irrelevant code from the example while keeping relevant code. After getting to a hard-coded initial state where the intent I had set up was being routed correctly, I flipped to "ask the bot to make a rough attempt at the build" mode, as I figured that Alexa API conventions are baked into model training sets at this point.
+
+The next catch was that the Alexa-hosted Lambdas have a pretty strict limit for included files, and merely including `requirements.txt` isn't enough to have dependencies installed on the fly. AWS SDK components are exempt from this limit, but anything else I included wouldn't be, and things like `pandas` or `requests` are unwieldy. If I were doing this a year ago I'd go back to the drawing board on where to host this work (next attempt probably would've been a proper "normal" Lambda function), but I wanted to see whether I could get the LLM to extract the relevant functionality (I only needed `get_dataset()` in this case) so that I could provide those functions with zero dependencies for this particular case, while keeping the same interface back to the code that had already been written. That way, when switching from the trivial-to-host Lambda implementation to a better one, it'd just be a matter of adding the Grid Status library dependency in and throwing away the custom code.
+

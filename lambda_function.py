@@ -3,6 +3,7 @@
 import logging
 import os
 from datetime import datetime, timezone
+from http import GridStatusClient
 
 import boto3
 from ask_sdk_core.handler_input import HandlerInput
@@ -10,7 +11,6 @@ from ask_sdk_core.skill_builder import CustomSkillBuilder
 from ask_sdk_core.utils import is_intent_name, is_request_type
 from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 from ask_sdk_model import Response
-from gridstatusio import GridStatusClient
 
 import api
 
@@ -82,10 +82,12 @@ ISO_DISPLAY_NAMES = {
     "YAD": "Alcoa",
 }
 
-ddb_region = os.environ.get('DYNAMODB_PERSISTENCE_REGION')
-ddb_table_name = os.environ.get('DYNAMODB_PERSISTENCE_TABLE_NAME')
-ddb_resource = boto3.resource('dynamodb', region_name=ddb_region)
-dynamodb_adapter = DynamoDbAdapter(table_name=ddb_table_name, create_table=False, dynamodb_resource=ddb_resource)
+ddb_region = os.environ.get("DYNAMODB_PERSISTENCE_REGION")
+ddb_table_name = os.environ.get("DYNAMODB_PERSISTENCE_TABLE_NAME")
+ddb_resource = boto3.resource("dynamodb", region_name=ddb_region)
+dynamodb_adapter = DynamoDbAdapter(
+    table_name=ddb_table_name, create_table=False, dynamodb_resource=ddb_resource
+)
 sb = CustomSkillBuilder(persistence_adapter=dynamodb_adapter)
 
 logger = logging.getLogger(__name__)
