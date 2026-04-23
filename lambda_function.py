@@ -93,6 +93,7 @@ sb = CustomSkillBuilder(persistence_adapter=dynamodb_adapter)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+
 def _load_config() -> dict:
     table = ddb_resource.Table(ddb_table_name)
     response = table.get_item(Key={"id": "config"})
@@ -102,6 +103,7 @@ def _load_config() -> dict:
 config = _load_config()
 GRID_STATUS_API_KEY = config.get("api_key")
 grid_status_client = GridStatusClient(api_key=GRID_STATUS_API_KEY)
+
 
 @sb.request_handler(can_handle_func=is_request_type("LaunchRequest"))
 def launch_request_handler(handler_input):
@@ -217,6 +219,10 @@ def current_energy_mix_handler(handler_input):
     iso = iso.upper()
     now = datetime.now(timezone.utc)
 
+    # Resolve the grid operator's local timezone so spoken times like "3 PM"
+    # are interpreted in the correct region rather than UTC.
+    iso_tz = api.get_iso_timezone(iso)
+
     # --- Date/time slot logic ---
     # Rule: if date is provided but time is not → reprompt for time
     if date_str and not time_str:
@@ -239,19 +245,24 @@ def current_energy_mix_handler(handler_input):
 
             if date_str and len(date_str) == 10:  # Specific date: "YYYY-MM-DD"
                 target_date = datetime.strptime(date_str, "%Y-%m-%d")
+                # Construct the datetime in the ISO's local timezone so that
+                # DST transitions are handled correctly, then convert to UTC.
                 target_time = datetime(
                     target_date.year,
                     target_date.month,
                     target_date.day,
                     hour,
                     minute,
-                    tzinfo=timezone.utc,
-                )
+                    tzinfo=iso_tz,
+                ).astimezone(timezone.utc)
             else:
-                # Time only (no date) → assume today in UTC
-                target_time = now.replace(
+                # Time only (no date) → use "today" in the ISO's local timezone
+                # so that, e.g., asking about 11 PM ERCOT time near midnight UTC
+                # resolves to the correct calendar date.
+                now_local = now.astimezone(iso_tz)
+                target_time = now_local.replace(
                     hour=hour, minute=minute, second=0, microsecond=0
-                )
+                ).astimezone(timezone.utc)
         except (ValueError, IndexError):
             speech = (
                 "I didn't understand that time. "

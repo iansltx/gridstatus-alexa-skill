@@ -1,8 +1,123 @@
 import logging
 from datetime import datetime, timedelta
 from datetime import timezone as tz_module
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Timezone mapping for ISO / EIA-BA identifiers
+# ---------------------------------------------------------------------------
+# Each entry maps an ISO or Balancing Authority code to the IANA timezone that
+# best represents its primary service territory.  When a user says "3 PM" for a
+# given grid, the skill interprets that wall-clock time in this timezone and
+# converts it to UTC before querying the API.
+#
+# Notes on ambiguous multi-timezone operators:
+#   MISO  – spans Central/Eastern; Central used (majority of load)
+#   TVA   – spans Central/Eastern; Central used (most of AL/MS/TN-west)
+#   SOCO  – spans Central/Eastern; Central used (AL/MS primary territory)
+#   IESO  – Ontario, Canada → America/Toronto (Eastern)
+#   IPCO  – Idaho Power → America/Boise (Mountain, observes DST unlike Phoenix)
+#   WALC  – Western Area Power Desert Southwest → America/Phoenix (no DST)
+#   DEAA  – Arlington Valley (AZ) → America/Phoenix (no DST)
+#   SRP   – Salt River Project (AZ) → America/Phoenix (no DST)
+#   TEPC  – Tucson Electric Power (AZ) → America/Phoenix (no DST)
+#   AZPS  – Arizona Public Service → America/Phoenix (no DST)
+ISO_TIMEZONES: dict[str, str] = {
+    # ---- Major ISO/RTOs ----
+    "ERCOT": "America/Chicago",
+    "CAISO": "America/Los_Angeles",
+    "ISONE": "America/New_York",
+    "NYISO": "America/New_York",
+    "MISO": "America/Chicago",
+    "PJM": "America/New_York",
+    "SPP": "America/Chicago",
+    "IESO": "America/Toronto",
+    # ---- EIA Balancing Authorities ----
+    "AECI": "America/Chicago",  # Associated Electric Cooperation, MO
+    "AVA": "America/Los_Angeles",  # Avista, Pacific NW (WA/ID/OR)
+    "AVRN": "America/New_York",  # Avangrid Renewables, primarily New England
+    "AZPS": "America/Phoenix",  # Arizona Public Service (no DST)
+    "BANC": "America/Los_Angeles",  # Balancing Authority of Northern California
+    "BPAT": "America/Los_Angeles",  # Bonneville Power Administration, Pacific NW
+    "CHPD": "America/Los_Angeles",  # Chelan County PUD, WA
+    "CPLE": "America/New_York",  # Duke Energy Progress East, NC
+    "CPLW": "America/New_York",  # Duke Energy Progress West, NC
+    "DEAA": "America/Phoenix",  # Arlington Valley, AZ (no DST)
+    "DOPD": "America/Los_Angeles",  # Douglas County PUD, WA
+    "DUK": "America/New_York",  # Duke Energy Carolinas, NC/SC
+    "EPE": "America/Denver",  # El Paso Electric, NM/TX
+    "FMPP": "America/New_York",  # Florida Municipal Power Pool
+    "FPC": "America/New_York",  # Duke Energy Florida
+    "FPL": "America/New_York",  # Florida Power and Light
+    "GCPD": "America/Los_Angeles",  # Grant County PUD, WA
+    "GRID": "America/Los_Angeles",  # Gridforce Energy Management, Pacific NW
+    "GVL": "America/New_York",  # Gainesville Regional Utilities, FL
+    "GWA": "America/Denver",  # NaturEner Power Watch, MT
+    "HST": "America/New_York",  # City of Homestead, FL
+    "IID": "America/Los_Angeles",  # Imperial Irrigation District, CA
+    "IPCO": "America/Boise",  # Idaho Power (Mountain, observes DST)
+    "JEA": "America/New_York",  # JEA, Jacksonville, FL
+    "LDWP": "America/Los_Angeles",  # LA Department of Water and Power
+    "LGEE": "America/New_York",  # LG&E, Louisville, KY (Eastern)
+    "NEVP": "America/Los_Angeles",  # Nevada Power
+    "NWMT": "America/Denver",  # NorthWestern Corporation, MT
+    "PACE": "America/Denver",  # PacifiCorp East, UT/WY
+    "PACW": "America/Los_Angeles",  # PacifiCorp West, OR/WA
+    "PGE": "America/Los_Angeles",  # Portland General Electric, OR
+    "PNM": "America/Denver",  # Public Service New Mexico
+    "PSCO": "America/Denver",  # Public Service Colorado
+    "PSEI": "America/Los_Angeles",  # Puget Sound Energy, WA
+    "SC": "America/New_York",  # South Carolina Public Service Authority
+    "SCEG": "America/New_York",  # Dominion Energy South Carolina
+    "SCL": "America/Los_Angeles",  # Seattle City Light
+    "SEC": "America/New_York",  # Seminole Electric Cooperative, FL
+    "SEPA": "America/New_York",  # Southeastern Power Administration
+    "SIKE": "America/Chicago",  # Sikeston Board of Municipal Utilities, MO
+    "SOCO": "America/Chicago",  # Southern Company (AL/MS primary territory)
+    "SPA": "America/Chicago",  # Southwestern Power Administration
+    "SRP": "America/Phoenix",  # Salt River Project, AZ (no DST)
+    "SWPP": "America/Chicago",  # Southwest Power Pool (EIA code for SPP)
+    "TAL": "America/New_York",  # City of Tallahassee, FL
+    "TEC": "America/New_York",  # Tampa Electric, FL
+    "TEPC": "America/Phoenix",  # Tucson Electric Power, AZ (no DST)
+    "TIDC": "America/Los_Angeles",  # Turlock Irrigation District, CA
+    "TPWR": "America/Los_Angeles",  # Tacoma Power, WA
+    "TVA": "America/Chicago",  # Tennessee Valley Authority (Central)
+    "WACM": "America/Denver",  # Western Area Power Admin – Rockies
+    "WALC": "America/Phoenix",  # Western Area Power Admin – Desert SW (no DST)
+    "WAUW": "America/Denver",  # Western Area Power Admin – Upper Great Plains W
+    "WWA": "America/Denver",  # NaturEner Wind Watch, MT
+    "YAD": "America/New_York",  # Alcoa (Yadkin), NC
+}
+
+
+def get_iso_timezone(iso: str) -> ZoneInfo:
+    """
+    Return a :class:`~zoneinfo.ZoneInfo` for the given ISO or EIA-BA code.
+
+    Falls back to UTC for any unrecognized code so the skill degrades
+    gracefully rather than raising an exception.
+
+    Args:
+        iso: ISO or BA code string (case-insensitive), e.g. ``"ERCOT"``.
+
+    Returns:
+        A :class:`~zoneinfo.ZoneInfo` instance for the operator's primary
+        local timezone.
+    """
+    tz_name = ISO_TIMEZONES.get(iso.upper(), "UTC")
+    try:
+        return ZoneInfo(tz_name)
+    except ZoneInfoNotFoundError:
+        logger.warning(
+            "Timezone '%s' not found for ISO '%s'; falling back to UTC",
+            tz_name,
+            iso,
+        )
+        return ZoneInfo("UTC")
+
 
 # Mapping from ISO codes to GridStatus dataset names
 ISO_FUEL_MIX_DATASETS = {
