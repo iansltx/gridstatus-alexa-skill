@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from datetime import timezone as tz_module
+from typing import Dict
 
 try:
     from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -31,7 +32,7 @@ logger = logging.getLogger(__name__)
 #   SRP   – Salt River Project (AZ) → America/Phoenix (no DST)
 #   TEPC  – Tucson Electric Power (AZ) → America/Phoenix (no DST)
 #   AZPS  – Arizona Public Service → America/Phoenix (no DST)
-ISO_TIMEZONES: dict[str, str] = {
+ISO_TIMEZONES: Dict[str, str] = {
     # ---- Major ISO/RTOs ----
     "ERCOT": "America/Chicago",
     "CAISO": "America/Los_Angeles",
@@ -106,7 +107,7 @@ ISO_TIMEZONES: dict[str, str] = {
 # Maps IANA timezone IDs to human-friendly names suitable for Alexa speech.
 # America/Phoenix is "Arizona Time" because Arizona (outside Navajo Nation)
 # does not observe DST, making it distinctively different from Mountain Time.
-FRIENDLY_TZ_NAMES: dict[str, str] = {
+FRIENDLY_TZ_NAMES: Dict[str, str] = {
     "America/New_York": "Eastern Time",
     "America/Toronto": "Eastern Time",
     "America/Chicago": "Central Time",
