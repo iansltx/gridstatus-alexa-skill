@@ -1,7 +1,14 @@
 import logging
 from datetime import datetime, timedelta
 from datetime import timezone as tz_module
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+try:
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+except ImportError:
+    from backports.zoneinfo import (  # type: ignore[no-redef]
+        ZoneInfo,
+        ZoneInfoNotFoundError,
+    )
 
 logger = logging.getLogger(__name__)
 
