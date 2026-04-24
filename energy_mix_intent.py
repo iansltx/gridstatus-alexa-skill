@@ -222,8 +222,9 @@ def handle_current_energy_mix(
             iso,
             target_time,
         )
+        time_label = api._format_local_time_for_speech(target_time, iso_tz)
         speech = (
-            f"I wasn't able to find data for {iso_display} at that time. "
+            f"I wasn't able to find data for {iso_display} at {time_label}. "
             f"EIA balancing authority data is typically posted on a one to two day delay, "
             f"so the most recent readings may not be available yet. "
             f"Try asking about the energy mix from a few days ago to access historical data."
