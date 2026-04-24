@@ -1,3 +1,82 @@
+## Running via Alexa Skills Kit
+
+### 1. Create an Alexa-hosted Python skill
+
+Log in to the [Alexa Developer Console](https://developer.amazon.com/alexa/console/ask) and create a new skill:
+
+- **Skill name:** Grid Status (or any name you prefer)
+- **Primary locale:** English (US)
+- **Model:** Custom
+- **Hosting:** Alexa-Hosted (Python)
+
+The console automatically provisions a Lambda function and a DynamoDB table for the skill. Keep the browser tab open — you'll return to it in later steps.
+
+### 2. Import the interaction model
+
+1. Click the **Build** tab.
+2. In the left sidebar, click **Interaction Model** → **JSON Editor**.
+3. Replace the entire contents of the editor with the contents of `alexa/interactionModels/custom/en-US.json`.
+4. Click **Save Model**, then **Build Model** and wait for the build to complete.
+
+### 3. Build the deployment package
+
+`lambda.zip` contains pre-bundled copies of `backports.zoneinfo` and `tzdata` (including only the American timezone data used by this skill). These packages cannot be installed on the fly inside an Alexa-hosted Lambda, so they must be shipped in the deployment ZIP alongside the application code.
+
+Add the four application source files and `alexa/requirements.txt` into the existing zip under the same `lambda/` prefix:
+
+```bash
+cp lambda.zip lambda_deploy.zip
+
+mkdir -p _stage/lambda
+cp lambda_function.py api.py gridstatus_lite.py energy_mix_intent.py _stage/lambda/
+cp alexa/requirements.txt _stage/lambda/requirements.txt
+
+cd _stage && zip -r ../lambda_deploy.zip lambda/ && cd ..
+rm -rf _stage
+```
+
+`alexa/requirements.txt` lists only the ASK SDK packages. The timezone packages are already in the zip and must **not** be listed there — the Alexa-hosted Lambda environment has strict limits on non-AWS package installations, and re-installing them would exceed those limits.
+
+### 4. Upload the code
+
+1. Click the **Code** tab in the developer console.
+2. Click the **three-dot menu (⋯)** next to your skill name at the top of the file tree and choose **Import Code**.
+3. Select `lambda_deploy.zip` and confirm the upload.
+4. Click **Save** and then **Deploy**.
+
+### 5. Store the GridStatus API key in DynamoDB
+
+The Lambda reads its GridStatus API key from DynamoDB at cold-start via `_load_config()` in `lambda_function.py`. The key must be present before the first invocation or the function will fail to initialise.
+
+1. Still in the **Code** tab, click **AWS Console** (top-right corner) to open the skill's Lambda in the AWS console.
+2. Under **Configuration → Environment variables**, note the values of `DYNAMODB_PERSISTENCE_REGION` and `DYNAMODB_PERSISTENCE_TABLE_NAME`.
+3. Navigate to **DynamoDB** in the AWS console (ensure you are in the correct region) and open that table.
+4. Add an item with the following attributes:
+
+   | Attribute | Type   | Value                   |
+   |-----------|--------|-------------------------|
+   | `id`      | String | `config`                |
+   | `api_key` | String | your GridStatus API key |
+
+   Or with the AWS CLI:
+
+   ```bash
+   aws dynamodb put-item \
+     --region <DYNAMODB_PERSISTENCE_REGION> \
+     --table-name <DYNAMODB_PERSISTENCE_TABLE_NAME> \
+     --item '{"id": {"S": "config"}, "api_key": {"S": "<your_gridstatus_api_key>"}}'
+   ```
+
+### 6. Test the skill
+
+Click the **Test** tab in the developer console and set the skill stage to **Development**. Try:
+
+> "Alexa, open Grid Status"
+
+> "What is the fuel mix for ERCOT right now?"
+
+> "What was the generation mix in California at 3 PM?"
+
 ## Running via Dialogflow/FastAPI
 
 ### Prerequisites

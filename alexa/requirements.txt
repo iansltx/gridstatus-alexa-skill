@@ -1,0 +1,10 @@
+# ASK SDK packages for the Alexa-hosted Lambda function.
+#
+# backports.zoneinfo and tzdata are NOT listed here — they are pre-bundled
+# inside lambda.zip and must be added to the deployment package manually
+# (see the "Running via Alexa Skills Kit" section of README.md).
+#
+# FastAPI and its dependencies are also NOT listed — they are only needed
+# for the Dialogflow/FastAPI path and are not used in Lambda.
+ask-sdk-core==1.19.0
+ask-sdk-dynamodb-persistence-adapter==1.19.0
