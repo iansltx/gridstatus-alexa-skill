@@ -6,5 +6,7 @@
 #
 # FastAPI and its dependencies are also NOT listed — they are only needed
 # for the Dialogflow/FastAPI path and are not used in Lambda.
+boto3==1.28.78
 ask-sdk-core==1.19.0
+ask-sdk-s3-persistence-adapter==1.0.0
 ask-sdk-dynamodb-persistence-adapter==1.19.0
