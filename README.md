@@ -1,3 +1,9 @@
+# Grid Status Voice Agent
+
+This is (the start of) a tool exposing Grid Status data in a voice-in, voice-out format, using your choice of Google Dialogflow in a browser (plus some API backing) or Alexa Skills Kit (hostable entirely on ASK's built-in Lambda infrastructure).
+
+This codebase was heavily LLM-generated; see commit history for the prompts I used. Anything without the robot emoji was me doing (minor) code edits directly.
+
 ## Running via Alexa Skills Kit
 
 ### 1. Create an Alexa-hosted Python skill
