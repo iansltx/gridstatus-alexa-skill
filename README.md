@@ -75,7 +75,7 @@ Click the **Test** tab in the developer console and set the skill stage to **Dev
 - Python 3.11+
 - A [GridStatus.io API key](https://www.gridstatus.io/)
 - A [Dialogflow ES agent](https://dialogflow.cloud.google.com/) with the `SystemOperator` entity and `CurrentEnergyMix` intent uploaded (see [`dialogflow/README.md`](dialogflow/README.md) for instructions)
-- A [Google Cloud service account](https://console.cloud.google.com/apis/credentials) with the **Dialogflow API Client** role enabled.
+- A [Google Cloud service account](https://console.cloud.google.com/apis/credentials) with the **Dialogflow API Client** role enabled AND the Dialogflor API enabled on the corresponding GCP project.
 
 ### Install dependencies
 
