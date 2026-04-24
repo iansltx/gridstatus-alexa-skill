@@ -3,22 +3,30 @@ FastAPI app for the Grid Status Dialogflow integration.
 
 Routes
 ------
-GET  /                    Serve the web chat UI (bot.html Jinja2 template).
-POST /hooks/dialogflow    Dialogflow v2 webhook fulfillment endpoint.
+GET  /                              Serve the web chat UI (bot.html Jinja2 template).
+POST /hooks/dialogflow              Dialogflow v2 webhook fulfillment endpoint.
+POST /sessions/{id}/detectIntent    Proxy detectIntent to Dialogflow, authenticated via
+                                    service-account credentials from the
+                                    DIALOGFLOW_SERVICE_CREDENTIALS_JSON env var.
 """
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import re
 from typing import Any
 
-from energy_mix_intent import handle_current_energy_mix
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+import google.auth.transport.requests
+import httpx
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from google.oauth2 import service_account
+from starlette.concurrency import run_in_threadpool
 
+from energy_mix_intent import handle_current_energy_mix
 from gridstatus_lite import GridStatusClient
 
 logger = logging.getLogger(__name__)
@@ -36,6 +44,45 @@ _grid_status_api_key = os.environ.get("GRIDSTATUS_API_KEY", "")
 grid_status_client: GridStatusClient | None = (
     GridStatusClient(api_key=_grid_status_api_key) if _grid_status_api_key else None
 )
+
+# ---------------------------------------------------------------------------
+# Dialogflow service-account credential cache
+# ---------------------------------------------------------------------------
+# Credentials are loaded once and refreshed automatically when the access
+# token expires (typically after one hour).
+_df_credentials: service_account.Credentials | None = None
+
+_DIALOGFLOW_SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
+
+
+def _get_fresh_token() -> str:
+    """Return a valid OAuth2 Bearer token for the Dialogflow service account.
+
+    This function is **synchronous** (google-auth uses the ``requests`` library
+    internally) and must be called via ``run_in_threadpool`` from async code so
+    it does not block the event loop.
+
+    Credentials are module-level cached and only refreshed when the current
+    access token has expired or has not yet been obtained.
+    """
+    global _df_credentials
+
+    if _df_credentials is None:
+        raw = os.environ.get("DIALOGFLOW_SERVICE_CREDENTIALS_JSON", "").strip()
+        if not raw:
+            raise RuntimeError(
+                "DIALOGFLOW_SERVICE_CREDENTIALS_JSON environment variable is not set"
+            )
+        info = json.loads(raw)
+        _df_credentials = service_account.Credentials.from_service_account_info(
+            info, scopes=_DIALOGFLOW_SCOPES
+        )
+
+    if not _df_credentials.valid:
+        auth_req = google.auth.transport.requests.Request()
+        _df_credentials.refresh(auth_req)
+
+    return _df_credentials.token  # type: ignore[return-value]
 
 
 # ---------------------------------------------------------------------------
@@ -80,15 +127,70 @@ def _extract_date_str(date_param: Any) -> str | None:
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request) -> HTMLResponse:
-    """Render the web chat UI, injecting Dialogflow credentials from env."""
-    return templates.TemplateResponse(
-        "bot.html",
-        {
-            "request": request,
-            "DIALOGFLOW_PROJECT_ID": os.environ.get("DIALOGFLOW_PROJECT_ID", ""),
-            "DIALOGFLOW_API_KEY": os.environ.get("DIALOGFLOW_API_KEY", ""),
-        },
+    """Render the web chat UI."""
+    return templates.TemplateResponse(request, "bot.html")
+
+
+@app.post("/sessions/{session_id}/detectIntent")
+async def detect_intent_proxy(session_id: str, request: Request) -> JSONResponse:
+    """Proxy a Dialogflow ES v2 detectIntent call, authenticated server-side.
+
+    The browser sends the same ``queryInput`` payload it would have sent
+    directly to Dialogflow.  This route forwards it to:
+
+        POST https://dialogflow.googleapis.com/v2/projects/{project}/agent/sessions/{session}:detectIntent
+
+    authenticated with an OAuth2 Bearer token obtained from the service-account
+    credentials stored in ``DIALOGFLOW_SERVICE_CREDENTIALS_JSON``.
+
+    The raw Dialogflow response (including status code) is forwarded back to
+    the caller unchanged, so the client-side JavaScript requires no changes
+    to how it parses the response.
+    """
+    project_id = os.environ.get("DIALOGFLOW_PROJECT_ID", "").strip()
+    if not project_id:
+        raise HTTPException(
+            status_code=500,
+            detail="DIALOGFLOW_PROJECT_ID environment variable is not set",
+        )
+
+    # Obtain / refresh the access token in a thread-pool (synchronous I/O).
+    try:
+        token = await run_in_threadpool(_get_fresh_token)
+    except (RuntimeError, ValueError, KeyError) as exc:
+        logger.exception("Failed to obtain Dialogflow service-account token")
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    body = await request.json()
+
+    dialogflow_url = (
+        f"https://dialogflow.googleapis.com/v2/projects/{project_id}"
+        f"/agent/sessions/{session_id}:detectIntent"
     )
+
+    logger.info(
+        "Proxying detectIntent to Dialogflow: session=%s project=%s",
+        session_id,
+        project_id,
+    )
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        resp = await client.post(
+            dialogflow_url,
+            json=body,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+        )
+
+    # Proxy the response (including non-2xx status codes) back to the caller.
+    try:
+        resp_body = resp.json()
+    except Exception:
+        resp_body = {"error": {"message": resp.text}}
+
+    return JSONResponse(content=resp_body, status_code=resp.status_code)
 
 
 @app.post("/hooks/dialogflow")

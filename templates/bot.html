@@ -66,9 +66,6 @@
         ></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
         <script>
-            const projectId = "{{ DIALOGFLOW_PROJECT_ID }}";
-            const apiKey = "{{ DIALOGFLOW_API_KEY }}";
-
             // Stable session ID for this page load so conversation context is preserved
             // across multiple turns within the same session.
             const sessionId = "gs-" + Math.random().toString(36).slice(2, 11);
@@ -128,13 +125,7 @@
                 document.getElementById("submitRequest").disabled = true;
                 document.getElementById("responseText").textContent = "";
 
-                const url =
-                    "https://dialogflow.googleapis.com/v2/projects/" +
-                    projectId +
-                    "/agent/sessions/" +
-                    sessionId +
-                    ":detectIntent?key=" +
-                    apiKey;
+                const url = "/sessions/" + sessionId + "/detectIntent";
 
                 try {
                     const resp = await fetch(url, {
