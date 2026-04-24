@@ -39,10 +39,6 @@ The `SystemOperator` entity maps canonical ISO / Balancing-Authority codes
    choose **Upload intent**.
 3. Select `intents/CurrentEnergyMix.json` and confirm.
 
-`CurrentEnergyMix.json` is a single self-contained file that includes both
-the intent definition (parameters, webhook flag, etc.) and the English
-training phrases under the `userSays` key.  No ZIP archive is required.
-
 ---
 
 ## Post-upload configuration
