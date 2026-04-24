@@ -216,6 +216,18 @@ def handle_current_energy_mix(
         speech = api.format_fuel_mix_speech(
             result, iso_display, iso_tz=iso_tz, is_current=is_current
         )
+    except api.EIADataDelayError:
+        logger.info(
+            "EIA data not yet available for %s at %s (likely posting delay)",
+            iso,
+            target_time,
+        )
+        speech = (
+            f"I wasn't able to find data for {iso_display} at that time. "
+            f"EIA balancing authority data is typically posted on a one to two day delay, "
+            f"so the most recent readings may not be available yet. "
+            f"Try asking about the energy mix from a few days ago to access historical data."
+        )
     except ValueError as e:
         logger.error("Fuel mix not available for %s: %s", iso, e)
         speech = f"I'm sorry, I couldn't find fuel mix data for {iso_display}. {e}"

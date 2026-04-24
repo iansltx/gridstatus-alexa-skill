@@ -3,6 +3,20 @@ from datetime import datetime, timedelta
 from datetime import timezone as tz_module
 from typing import Dict
 
+
+class EIADataDelayError(Exception):
+    """Raised when an EIA BA query returns no data for a recent time window.
+
+    EIA balancing-authority data is typically posted on a one-to-two day
+    delay.  When the requested time is within roughly three days of *now*
+    and the API returns nothing, this exception signals that the absence of
+    data is most likely due to that posting lag rather than a genuine data
+    gap.
+    """
+
+    pass
+
+
 try:
     from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 except ImportError:
@@ -452,6 +466,19 @@ def _query_eia_ba_fuel_mix(client, ba_code, target_time):
     )
 
     if not data:
+        # Determine whether the empty result is likely caused by the EIA
+        # posting delay (~1–2 days for most BAs) rather than a genuine
+        # data gap.  Use a 3-day (72-hour) window to be conservative.
+        now_naive = datetime.utcnow()
+        target_naive = _to_utc_naive(target_time)
+        if target_naive is not None:
+            age_hours = (now_naive - target_naive).total_seconds() / 3600
+        else:
+            age_hours = float("inf")
+
+        if age_hours < 72:
+            raise EIADataDelayError(ba_code)
+
         raise ValueError(
             f"No data returned from eia_fuel_mix_hourly for Balancing Authority '{ba_code}'"
         )
