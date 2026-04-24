@@ -8,10 +8,10 @@ export format, ready to be uploaded to an existing Dialogflow ES agent.
 ```
 dialogflow/
 ├── entities/
-│   └── SystemOperator.json              # Custom entity with all ISO / BA codes
+│   └── SystemOperator.json   # Custom entity with all ISO / BA codes
 └── intents/
-    ├── CurrentEnergyMix.json            # Intent definition (parameters, webhook flag)
-    └── CurrentEnergyMix_usersays_en.json  # English training phrases
+    └── CurrentEnergyMix.json # Intent definition with parameters, webhook
+                              # flag, and English training phrases
 ```
 
 ---
@@ -34,27 +34,14 @@ The `SystemOperator` entity maps canonical ISO / Balancing-Authority codes
 
 ## Uploading the intent
 
-Dialogflow ES stores the intent definition and its training phrases in two
-separate files.  The console's **Upload intent** feature expects them bundled
-together in a ZIP archive.
-
-### Step 1 — create the ZIP
-
-From this directory run:
-
-```bash
-cd intents
-zip CurrentEnergyMix.zip \
-    CurrentEnergyMix.json \
-    CurrentEnergyMix_usersays_en.json
-```
-
-### Step 2 — upload
-
 1. Click **Intents** in the left sidebar.
 2. Click the **⋮ (three-dot)** menu at the top right of the Intents list and
    choose **Upload intent**.
-3. Select the `CurrentEnergyMix.zip` file you just created and confirm.
+3. Select `intents/CurrentEnergyMix.json` and confirm.
+
+`CurrentEnergyMix.json` is a single self-contained file that includes both
+the intent definition (parameters, webhook flag, etc.) and the English
+training phrases under the `userSays` key.  No ZIP archive is required.
 
 ---
 
@@ -81,11 +68,11 @@ After uploading:
 
 ## Parameter mapping
 
-| Dialogflow parameter | Entity type     | Alexa slot equivalent |
-|----------------------|-----------------|-----------------------|
+| Dialogflow parameter | Entity type       | Alexa slot equivalent |
+|----------------------|-------------------|-----------------------|
 | `iso`                | `@SystemOperator` | `iso` (`SystemOperator`) |
-| `time`               | `@sys.time`     | `time` (`AMAZON.TIME`) |
-| `date`               | `@sys.date`     | `date` (`AMAZON.DATE`) |
+| `time`               | `@sys.time`       | `time` (`AMAZON.TIME`) |
+| `date`               | `@sys.date`       | `date` (`AMAZON.DATE`) |
 
 Dialogflow delivers `@sys.time` and `@sys.date` as full ISO-8601 timestamps.
 The webhook (`main.py`) strips them down to `HH:MM` and `YYYY-MM-DD`

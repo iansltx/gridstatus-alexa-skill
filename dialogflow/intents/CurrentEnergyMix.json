@@ -15,7 +15,7 @@
           "dataType": "@SystemOperator",
           "name": "iso",
           "value": "$iso",
-          "prompts": {},
+          "prompts": [],
           "isList": false
         },
         {
@@ -24,7 +24,7 @@
           "dataType": "@sys.time",
           "name": "time",
           "value": "$time",
-          "prompts": {},
+          "prompts": [],
           "isList": false
         },
         {
@@ -33,7 +33,7 @@
           "dataType": "@sys.date",
           "name": "date",
           "value": "$date",
-          "prompts": {},
+          "prompts": [],
           "isList": false
         }
       ],
@@ -46,6 +46,328 @@
       ],
       "defaultResponsePlatforms": {},
       "speech": []
+    }
+  ],
+  "userSays": [
+    {
+      "id": "a1b2c3d4-0001-0001-0001-a1b2c3d40001",
+      "data": [
+        { "text": "How is electricity in ", "userDefined": false },
+        {
+          "text": "ERCOT",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " generated right now", "userDefined": false }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0002-0002-0002-a1b2c3d40002",
+      "data": [
+        { "text": "How was electricity generated in ", "userDefined": false },
+        {
+          "text": "CAISO",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " on ", "userDefined": false },
+        {
+          "text": "Tuesday",
+          "alias": "date",
+          "meta": "@sys.date",
+          "userDefined": true
+        },
+        { "text": " at ", "userDefined": false },
+        {
+          "text": "3 PM",
+          "alias": "time",
+          "meta": "@sys.time",
+          "userDefined": true
+        }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0003-0003-0003-a1b2c3d40003",
+      "data": [
+        { "text": "How was electricity generated in ", "userDefined": false },
+        {
+          "text": "PJM",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " at ", "userDefined": false },
+        {
+          "text": "noon",
+          "alias": "time",
+          "meta": "@sys.time",
+          "userDefined": true
+        }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0004-0004-0004-a1b2c3d40004",
+      "data": [
+        { "text": "How is electricity generated in ", "userDefined": false },
+        {
+          "text": "MISO",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " right now", "userDefined": false }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0005-0005-0005-a1b2c3d40005",
+      "data": [
+        { "text": "Where is electricity in ", "userDefined": false },
+        {
+          "text": "NYISO",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " coming from right now", "userDefined": false }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0006-0006-0006-a1b2c3d40006",
+      "data": [
+        { "text": "What was the fuel mix for ", "userDefined": false },
+        {
+          "text": "ISONE",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " on ", "userDefined": false },
+        {
+          "text": "January 15th",
+          "alias": "date",
+          "meta": "@sys.date",
+          "userDefined": true
+        },
+        { "text": " at ", "userDefined": false },
+        {
+          "text": "2 PM",
+          "alias": "time",
+          "meta": "@sys.time",
+          "userDefined": true
+        }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0007-0007-0007-a1b2c3d40007",
+      "data": [
+        { "text": "What is the fuel mix for ", "userDefined": false },
+        {
+          "text": "SPP",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " right now", "userDefined": false }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0008-0008-0008-a1b2c3d40008",
+      "data": [
+        { "text": "Where did electricity come from in ", "userDefined": false },
+        {
+          "text": "TVA",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " on ", "userDefined": false },
+        {
+          "text": "Monday",
+          "alias": "date",
+          "meta": "@sys.date",
+          "userDefined": true
+        },
+        { "text": " at ", "userDefined": false },
+        {
+          "text": "9 AM",
+          "alias": "time",
+          "meta": "@sys.time",
+          "userDefined": true
+        }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0009-0009-0009-a1b2c3d40009",
+      "data": [
+        { "text": "What was the generation mix in ", "userDefined": false },
+        {
+          "text": "ERCOT",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " ", "userDefined": false },
+        {
+          "text": "yesterday",
+          "alias": "date",
+          "meta": "@sys.date",
+          "userDefined": true
+        },
+        { "text": " at ", "userDefined": false },
+        {
+          "text": "6 PM",
+          "alias": "time",
+          "meta": "@sys.time",
+          "userDefined": true
+        }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0010-0010-0010-a1b2c3d40010",
+      "data": [
+        { "text": "What was the generation mix in ", "userDefined": false },
+        {
+          "text": "CAISO",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " at ", "userDefined": false },
+        {
+          "text": "midnight",
+          "alias": "time",
+          "meta": "@sys.time",
+          "userDefined": true
+        }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0011-0011-0011-a1b2c3d40011",
+      "data": [
+        { "text": "Where is electricity for ", "userDefined": false },
+        {
+          "text": "PJM",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " coming from right now", "userDefined": false }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0012-0012-0012-a1b2c3d40012",
+      "data": [
+        {
+          "text": "What is the current generation mix in ",
+          "userDefined": false
+        },
+        {
+          "text": "MISO",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0013-0013-0013-a1b2c3d40013",
+      "data": [
+        { "text": "What is the energy mix for ", "userDefined": false },
+        {
+          "text": "Texas",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " right now", "userDefined": false }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0014-0014-0014-a1b2c3d40014",
+      "data": [
+        { "text": "Show me the generation mix for ", "userDefined": false },
+        {
+          "text": "New England",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
+    },
+    {
+      "id": "a1b2c3d4-0015-0015-0015-a1b2c3d40015",
+      "data": [
+        { "text": "How is ", "userDefined": false },
+        {
+          "text": "California",
+          "alias": "iso",
+          "meta": "@SystemOperator",
+          "userDefined": true
+        },
+        { "text": " generating power right now", "userDefined": false }
+      ],
+      "isTemplate": false,
+      "count": 0,
+      "updated": 0,
+      "lang": "en"
     }
   ],
   "priority": 500000,
