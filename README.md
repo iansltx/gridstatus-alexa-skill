@@ -1,3 +1,55 @@
+## Running via Dialogflow/FastAPI
+
+### Prerequisites
+
+- Python 3.11+
+- A [GridStatus.io API key](https://www.gridstatus.io/)
+- A [Dialogflow ES agent](https://dialogflow.cloud.google.com/) with the `SystemOperator` entity and `CurrentEnergyMix` intent uploaded (see [`dialogflow/README.md`](dialogflow/README.md) for instructions)
+- A [Google Cloud API key](https://console.cloud.google.com/apis/credentials) with the Dialogflow API enabled, scoped to your project
+
+### Environment variables
+
+| Variable | Description |
+|---|---|
+| `GRIDSTATUS_API_KEY` | Your GridStatus.io API key |
+| `DIALOGFLOW_PROJECT_ID` | Your Google Cloud project ID (visible in the Dialogflow agent settings) |
+| `DIALOGFLOW_API_KEY` | Your Google Cloud API key with Dialogflow API access |
+
+Copy these into a `.env` file in the project root:
+
+```
+GRIDSTATUS_API_KEY=your_gridstatus_key
+DIALOGFLOW_PROJECT_ID=your_gcp_project_id
+DIALOGFLOW_API_KEY=your_gcp_api_key
+```
+
+### Install dependencies
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Configure the Dialogflow agent
+
+Follow the steps in [`dialogflow/README.md`](dialogflow/README.md) to upload the `SystemOperator` entity and `CurrentEnergyMix` intent to your agent, then point the agent's webhook fulfillment URL at `https://<your-host>/hooks/dialogflow`.
+
+### Run the server
+
+```bash
+uvicorn main:app --reload
+```
+
+The chat UI will be available at `http://localhost:8000`. The Dialogflow webhook endpoint is at `http://localhost:8000/hooks/dialogflow`.
+
+For exposing your local server to Dialogflow during development, a tunnelling tool such as [ngrok](https://ngrok.com/) is useful:
+
+```bash
+ngrok http 8000
+# then set the webhook URL in Dialogflow to https://<your-ngrok-id>.ngrok-free.app/hooks/dialogflow
+```
+
 ## Decision log
 
 The general idea: build a skill/action baked into an existing voice agent platform (so folks don't have to install a completely different app, nor go out of their way in a workflow) to pull various pieces of Grid Status information. How much data to expose is basically dictated by "I'm going to see how far I can get in six hours, starting from scratch," starting with easier things like current/historical energy usage/fuel mix and then moving on to items that require persistence like "what are energy prices like at the resource node closest to me."
