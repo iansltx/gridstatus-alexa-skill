@@ -35,23 +35,21 @@ cd _stage && zip -r ../lambda_deploy.zip lambda/ && cd ..
 rm -rf _stage
 ```
 
-`alexa/requirements.txt` lists only the ASK SDK packages. The timezone packages are already in the zip and must **not** be listed there — the Alexa-hosted Lambda environment has strict limits on non-AWS package installations, and re-installing them would exceed those limits.
+`alexa/requirements.txt` lists only the ASK SDK packages that are baked into the ASK Lambda base layer; other deps were thinned before being added to the zip file to stay under ASK's 100-file 6MB limit.
 
 ### 4. Upload the code
 
 1. Click the **Code** tab in the developer console.
-2. Click the **three-dot menu (⋯)** next to your skill name at the top of the file tree and choose **Import Code**.
+2. Click the **Import Code** button in the toolbar.
 3. Select `lambda_deploy.zip` and confirm the upload.
 4. Click **Save** and then **Deploy**.
 
 ### 5. Store the GridStatus API key in DynamoDB
 
-The Lambda reads its GridStatus API key from DynamoDB at cold-start via `_load_config()` in `lambda_function.py`. The key must be present before the first invocation or the function will fail to initialise.
+The Lambda reads its GridStatus API key from DynamoDB at cold-start via `_load_config()` in `lambda_function.py`. The key must be present before the first invocation or the function will fail to initialize.
 
-1. Still in the **Code** tab, click **AWS Console** (top-right corner) to open the skill's Lambda in the AWS console.
-2. Under **Configuration → Environment variables**, note the values of `DYNAMODB_PERSISTENCE_REGION` and `DYNAMODB_PERSISTENCE_TABLE_NAME`.
-3. Navigate to **DynamoDB** in the AWS console (ensure you are in the correct region) and open that table.
-4. Add an item with the following attributes:
+1. Still in the **Code** tab, click **DynamoDB database**.
+2. Click **Actions** > **Create item** and set the following for the new item:
 
    | Attribute | Type   | Value                   |
    |-----------|--------|-------------------------|
@@ -59,13 +57,6 @@ The Lambda reads its GridStatus API key from DynamoDB at cold-start via `_load_c
    | `api_key` | String | your GridStatus API key |
 
    Or with the AWS CLI:
-
-   ```bash
-   aws dynamodb put-item \
-     --region <DYNAMODB_PERSISTENCE_REGION> \
-     --table-name <DYNAMODB_PERSISTENCE_TABLE_NAME> \
-     --item '{"id": {"S": "config"}, "api_key": {"S": "<your_gridstatus_api_key>"}}'
-   ```
 
 ### 6. Test the skill
 
