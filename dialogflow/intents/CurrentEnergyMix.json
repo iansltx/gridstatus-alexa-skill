@@ -1,0 +1,59 @@
+{
+  "id": "a3f9e2b1-4c7d-4e8f-9a0b-1c2d3e4f5a6b",
+  "name": "CurrentEnergyMix",
+  "auto": true,
+  "contexts": [],
+  "responses": [
+    {
+      "resetContexts": false,
+      "action": "CurrentEnergyMix",
+      "affectedContexts": [],
+      "parameters": [
+        {
+          "id": "f1e2d3c4-b5a6-4789-8901-234567890abc",
+          "required": false,
+          "dataType": "@SystemOperator",
+          "name": "iso",
+          "value": "$iso",
+          "prompts": {},
+          "isList": false
+        },
+        {
+          "id": "a9b8c7d6-e5f4-4321-b0a9-876543210def",
+          "required": false,
+          "dataType": "@sys.time",
+          "name": "time",
+          "value": "$time",
+          "prompts": {},
+          "isList": false
+        },
+        {
+          "id": "12345678-90ab-4cde-8f01-23456789abcd",
+          "required": false,
+          "dataType": "@sys.date",
+          "name": "date",
+          "value": "$date",
+          "prompts": {},
+          "isList": false
+        }
+      ],
+      "messages": [
+        {
+          "type": 0,
+          "lang": "en",
+          "speech": []
+        }
+      ],
+      "defaultResponsePlatforms": {},
+      "speech": []
+    }
+  ],
+  "priority": 500000,
+  "webhookUsed": true,
+  "webhookForSlotFilling": false,
+  "fallbackIntent": false,
+  "events": [],
+  "conditionalResponses": [],
+  "condition": "",
+  "conditionalFollowupEvents": []
+}

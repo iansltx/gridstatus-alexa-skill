@@ -2,7 +2,6 @@
 
 import logging
 import os
-from datetime import datetime, timezone
 
 import boto3
 from ask_sdk_core.handler_input import HandlerInput
@@ -11,76 +10,10 @@ from ask_sdk_core.utils import is_intent_name, is_request_type
 from ask_sdk_dynamodb.adapter import DynamoDbAdapter
 from ask_sdk_model import Response
 
-import api
+from energy_mix_intent import handle_current_energy_mix
 from gridstatus_lite import GridStatusClient
 
 SKILL_NAME = "Grid Status"
-
-ISO_DISPLAY_NAMES = {
-    "ERCOT": "ERCOT",
-    "CAISO": "CAISO",
-    "ISONE": "ISO New England",
-    "NYISO": "the New York ISO",
-    "MISO": "MISO",
-    "PJM": "PJM",
-    "SPP": "SPP",
-    "IESO": "the Ontario grid",
-    "AECI": "AECI",
-    "AVA": "Avista",
-    "AVRN": "Avangrid",
-    "AZPS": "Arizona Public Service",
-    "BANC": "the Balancing Authority of Northern California",
-    "BPAT": "Bonneville Power Administration",
-    "CHPD": "Chelan County PUD",
-    "CPLE": "Duke Energy Progress East",
-    "CPLW": "Duke Energy Progress West",
-    "DEAA": "Arlington Valley",
-    "DOPD": "Douglas County PUD",
-    "DUK": "Duke Energy Carolinas",
-    "EPE": "El Paso Electric",
-    "FMPP": "the Florida Municipal Power Pool",
-    "FPC": "Duke Energy Florida",
-    "FPL": "Florida Power and Light",
-    "GCPD": "Grant County PUD",
-    "GRID": "Gridforce Energy Management",
-    "GVL": "Gainesville Regional Utilities",
-    "GWA": "NaturEner Power Watch",
-    "HST": "the City of Homestead",
-    "IID": "Imperial Irrigation District",
-    "IPCO": "Idaho Power",
-    "JEA": "JEA",
-    "LDWP": "the LA Department of Water and Power",
-    "LGEE": "LG&E",
-    "NEVP": "Nevada Power",
-    "NWMT": "NorthWestern Corporation",
-    "PACE": "PacifiCorp East",
-    "PACW": "PacifiCorp West",
-    "PGE": "Portland General Electric",
-    "PNM": "Public Service New Mexico",
-    "PSCO": "Public Service Colorado",
-    "PSEI": "Puget Sound Energy",
-    "SC": "the South Carolina Public Service Authority",
-    "SCEG": "Dominion Energy South Carolina",
-    "SCL": "Seattle City Light",
-    "SEC": "Seminole Electric Cooperative",
-    "SEPA": "the Southeastern Power Administration",
-    "SIKE": "Sikeston Board of Municipal Utilities",
-    "SOCO": "Southern Company",
-    "SPA": "the Southwestern Power Administration",
-    "SRP": "Salt River Project",
-    "SWPP": "Southwest Power Pool",
-    "TAL": "Tallahassee",
-    "TEC": "Tampa Electric",
-    "TEPC": "Tucson Electric Power",
-    "TIDC": "Turlock Irrigation District",
-    "TPWR": "Tacoma Power",
-    "TVA": "the Tennessee Valley Authority",
-    "WACM": "the Western Area Power Administration Rockies",
-    "WALC": "the Western Area Power Administration Desert Southwest",
-    "WAUW": "the Western Area Power Administration Upper Great Plains West",
-    "WWA": "NaturEner Wind Watch",
-    "YAD": "Alcoa",
-}
 
 ddb_region = os.environ.get("DYNAMODB_PERSISTENCE_REGION")
 ddb_table_name = os.environ.get("DYNAMODB_PERSISTENCE_TABLE_NAME")
@@ -206,106 +139,16 @@ def current_energy_mix_handler(handler_input):
     time_str = time_slot.value if (time_slot and time_slot.value) else None
     date_str = date_slot.value if (date_slot and date_slot.value) else None
 
-    # --- Validate ISO ---
-    if not iso:
-        speech = (
-            "Which electric grid or power system would you like information for? "
-            "For example, say ERCOT, CAISO, or PJM."
-        )
-        reprompt = "Please tell me which grid system you want information for."
+    # Delegate all validation, API calls, and response formatting to the
+    # shared handler in energy_mix_intent.py.
+    speech, reprompt = handle_current_energy_mix(
+        grid_status_client, iso, time_str, date_str
+    )
+
+    if reprompt:
         handler_input.response_builder.speak(speech).ask(reprompt)
-        return handler_input.response_builder.response
-
-    iso = iso.upper()
-    now = datetime.now(timezone.utc)
-
-    # Resolve the grid operator's local timezone so spoken times like "3 PM"
-    # are interpreted in the correct region rather than UTC.
-    iso_tz = api.get_iso_timezone(iso)
-
-    # --- Date/time slot logic ---
-    # Rule: if date is provided but time is not → reprompt for time
-    if date_str and not time_str:
-        speech = (
-            "What time would you like the fuel mix for? For example, say 3 PM or noon."
-        )
-        reprompt = "Please provide a time, for example, 3 PM."
-        handler_input.response_builder.speak(speech).ask(reprompt)
-        return handler_input.response_builder.response
-
-    # Parse the target datetime (default: current time)
-    target_time = now
-
-    if time_str:
-        try:
-            # Alexa TIME slot: 24-hour "HH:MM" format
-            time_parts = time_str.split(":")
-            hour = int(time_parts[0])
-            minute = int(time_parts[1]) if len(time_parts) > 1 else 0
-
-            if date_str and len(date_str) == 10:  # Specific date: "YYYY-MM-DD"
-                target_date = datetime.strptime(date_str, "%Y-%m-%d")
-                # Construct the datetime in the ISO's local timezone so that
-                # DST transitions are handled correctly, then convert to UTC.
-                target_time = datetime(
-                    target_date.year,
-                    target_date.month,
-                    target_date.day,
-                    hour,
-                    minute,
-                    tzinfo=iso_tz,
-                ).astimezone(timezone.utc)
-            else:
-                # Time only (no date) → use "today" in the ISO's local timezone
-                # so that, e.g., asking about 11 PM ERCOT time near midnight UTC
-                # resolves to the correct calendar date.
-                now_local = now.astimezone(iso_tz)
-                target_time = now_local.replace(
-                    hour=hour, minute=minute, second=0, microsecond=0
-                ).astimezone(timezone.utc)
-        except (ValueError, IndexError):
-            speech = (
-                "I didn't understand that time. "
-                "Please try again, for example, say 3 PM."
-            )
-            reprompt = "What time would you like the fuel mix for?"
-            handler_input.response_builder.speak(speech).ask(reprompt)
-            return handler_input.response_builder.response
-
-    # --- Validate: reprompt if target time is in the future ---
-    if target_time > now:
-        speech = (
-            "I can only provide data for times that have already passed. "
-            "Please ask about a time in the past."
-        )
-        reprompt = "What time in the past would you like the fuel mix for?"
-        handler_input.response_builder.speak(speech).ask(reprompt)
-        return handler_input.response_builder.response
-
-    # --- Fetch and format fuel mix ---
-    iso_display = ISO_DISPLAY_NAMES.get(iso, iso)
-
-    try:
-        result = api.get_fuel_mix(grid_status_client, iso, target_time)
-        is_current = time_str is None and date_str is None
-        speech_text = api.format_fuel_mix_speech(
-            result, iso_display, iso_tz=iso_tz, is_current=is_current
-        )
-    except ValueError as e:
-        logger.error("Fuel mix not available for %s: %s", iso, e)
-        speech_text = (
-            f"I'm sorry, I couldn't find fuel mix data for {iso_display}. {str(e)}"
-        )
-    except Exception as e:
-        logger.error(
-            "Unexpected error fetching fuel mix for %s: %s", iso, e, exc_info=True
-        )
-        speech_text = (
-            f"I'm sorry, there was an error getting the energy mix for "
-            f"{iso_display}. Please try again later."
-        )
-
-    handler_input.response_builder.speak(speech_text)
+    else:
+        handler_input.response_builder.speak(speech)
     return handler_input.response_builder.response
 
 

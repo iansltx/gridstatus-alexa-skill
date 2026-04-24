@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Grid Status Bot</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+            crossorigin="anonymous"
+        />
+        <style>
+            body {
+                margin-top: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container-fluid" id="botDashboard">
+            <h1>Grid Status Bot</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <div id="speechRecognition" class="pb-2">
+                        Speech recognition is not supported in your browser
+                    </div>
+                    <form class="d-flex gap-2 mb-2" id="requestForm">
+                        <input
+                            id="requestText"
+                            type="text"
+                            autocomplete="off"
+                            class="form-control"
+                            placeholder="What is your command?"
+                        />
+                        <button
+                            id="submitRequest"
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            Request
+                        </button>
+                    </form>
+                    <div class="form-check mb-2" id="speechCheckbox">
+                        <label class="form-check-label">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                id="speakResult"
+                                disabled
+                            />
+                            Speech synthesis is not supported in your browser
+                        </label>
+                    </div>
+                    <p>
+                        <strong>Text Response:</strong>
+                        <span id="responseText"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"
+        ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+        <script>
+            const projectId = "{{ DIALOGFLOW_PROJECT_ID }}";
+            const apiKey = "{{ DIALOGFLOW_API_KEY }}";
+
+            // Stable session ID for this page load so conversation context is preserved
+            // across multiple turns within the same session.
+            const sessionId = "gs-" + Math.random().toString(36).slice(2, 11);
+
+            let isRequesting = false;
+
+            // ---- Speech synthesis ----
+            // Only show "Speak result" checkbox when the browser supports synthesis.
+            if ("speechSynthesis" in window) {
+                document.getElementById("speechCheckbox").innerHTML =
+                    '<label class="form-check-label">' +
+                    '<input class="form-check-input" type="checkbox" id="speakResult">' +
+                    "Speak result</label>";
+            }
+
+            // ---- Speech recognition (annyang) ----
+            // See https://www.talater.com/annyang/ and
+            // https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API for browser support.
+            if (typeof annyang !== "undefined" && annyang) {
+                annyang.addCommands({
+                    "*text": function (text) {
+                        const btn = document.getElementById("listenButton");
+                        btn.disabled = false;
+                        btn.textContent = "Listen";
+                        document.getElementById("requestText").value = text;
+                        sendRequest(text);
+                        annyang.abort();
+                    },
+                });
+
+                function listenForSpeech() {
+                    if (annyang.isListening()) return;
+                    const btn = document.getElementById("listenButton");
+                    btn.disabled = true;
+                    btn.textContent = "Listening\u2026";
+                    annyang.start();
+                }
+
+                document.getElementById("speechRecognition").innerHTML =
+                    '<button class="btn btn-success" id="listenButton" ' +
+                    'onclick="listenForSpeech()">Listen</button>';
+            }
+
+            // ---- Form submit ----
+            document
+                .getElementById("requestForm")
+                .addEventListener("submit", function (e) {
+                    e.preventDefault();
+                    sendRequest(document.getElementById("requestText").value);
+                });
+
+            // ---- Dialogflow ES v2 detectIntent ----
+            async function sendRequest(text) {
+                if (isRequesting || !text.trim()) return;
+
+                isRequesting = true;
+                document.getElementById("submitRequest").disabled = true;
+                document.getElementById("responseText").textContent = "";
+
+                const url =
+                    "https://dialogflow.googleapis.com/v2/projects/" +
+                    projectId +
+                    "/agent/sessions/" +
+                    sessionId +
+                    ":detectIntent?key=" +
+                    apiKey;
+
+                try {
+                    const resp = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            queryInput: {
+                                text: {
+                                    text: text,
+                                    languageCode: "en-US",
+                                },
+                            },
+                        }),
+                    });
+
+                    if (!resp.ok) {
+                        let errMsg = "HTTP " + resp.status;
+                        try {
+                            const errBody = await resp.json();
+                            if (errBody.error && errBody.error.message) {
+                                errMsg = errBody.error.message;
+                            }
+                        } catch (_) {
+                            /* ignore parse errors */
+                        }
+                        throw new Error(errMsg);
+                    }
+
+                    const data = await resp.json();
+                    console.log(data);
+
+                    const fulfillmentText =
+                        (data.queryResult &&
+                            data.queryResult.fulfillmentText) ||
+                        "";
+
+                    if ("speechSynthesis" in window) {
+                        const speakCheckbox =
+                            document.getElementById("speakResult");
+                        if (
+                            speakCheckbox &&
+                            speakCheckbox.checked &&
+                            fulfillmentText
+                        ) {
+                            window.speechSynthesis.speak(
+                                new SpeechSynthesisUtterance(fulfillmentText),
+                            );
+                        }
+                    }
+
+                    document.getElementById("responseText").textContent =
+                        fulfillmentText;
+                } catch (err) {
+                    document.getElementById("responseText").textContent =
+                        "Request failed. See console for details.";
+                    console.error(err);
+                } finally {
+                    document.getElementById("submitRequest").disabled = false;
+                    isRequesting = false;
+                }
+            }
+        </script>
+    </body>
+</html>

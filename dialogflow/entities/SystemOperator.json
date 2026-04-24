@@ -1,0 +1,263 @@
+{
+  "id": "system-operator-entity-001",
+  "name": "SystemOperator",
+  "isOverridable": true,
+  "isEnum": false,
+  "isRegexp": false,
+  "automatedExpansion": false,
+  "allowFuzzyExtraction": false,
+  "entities": [
+    {
+      "value": "ERCOT",
+      "synonyms": ["ERCOT", "Texas"]
+    },
+    {
+      "value": "CAISO",
+      "synonyms": ["CAISO", "California"]
+    },
+    {
+      "value": "ISONE",
+      "synonyms": ["ISONE", "ISO New England", "New England"]
+    },
+    {
+      "value": "NYISO",
+      "synonyms": ["NYISO", "New York ISO", "New York"]
+    },
+    {
+      "value": "MISO",
+      "synonyms": ["MISO"]
+    },
+    {
+      "value": "PJM",
+      "synonyms": ["PJM"]
+    },
+    {
+      "value": "SPP",
+      "synonyms": ["SPP"]
+    },
+    {
+      "value": "IESO",
+      "synonyms": ["IESO", "Ontario"]
+    },
+    {
+      "value": "AECI",
+      "synonyms": ["AECI", "Associated Electric Cooperative"]
+    },
+    {
+      "value": "AVA",
+      "synonyms": ["AVA", "Avista"]
+    },
+    {
+      "value": "AVRN",
+      "synonyms": ["AVRN", "Avangrid"]
+    },
+    {
+      "value": "AZPS",
+      "synonyms": ["AZPS", "Arizona Public Service Company", "Arizona Public Service", "Arizona"]
+    },
+    {
+      "value": "BANC",
+      "synonyms": ["BANC", "Balancing Authority of Northern California"]
+    },
+    {
+      "value": "BPAT",
+      "synonyms": ["BPAT", "Bonneville Power Administration", "Bonneville"]
+    },
+    {
+      "value": "CHPD",
+      "synonyms": ["CHPD", "Public Utility District Number 1 of Chelan County", "Chelan County PUD"]
+    },
+    {
+      "value": "CPLE",
+      "synonyms": ["CPLE", "Duke Energy Progress East", "Duke East"]
+    },
+    {
+      "value": "CPLW",
+      "synonyms": ["CPLW", "Duke Energy Progress West", "Duke West"]
+    },
+    {
+      "value": "DEAA",
+      "synonyms": ["DEAA", "Arlington Valley"]
+    },
+    {
+      "value": "DOPD",
+      "synonyms": ["DOPD", "PUD Number 1 of Douglas County", "Douglas County PUD", "Douglas County"]
+    },
+    {
+      "value": "DUK",
+      "synonyms": ["DUK", "Duke Energy Carolinas", "Duke Carolinas"]
+    },
+    {
+      "value": "EPE",
+      "synonyms": ["EPE", "El Paso Electric Company", "El Paso Electric", "El Paso"]
+    },
+    {
+      "value": "FMPP",
+      "synonyms": ["FMPP", "Florida Municipal Power Pool"]
+    },
+    {
+      "value": "FPC",
+      "synonyms": ["FPC", "Duke Energy Florida", "Duke Florida"]
+    },
+    {
+      "value": "FPL",
+      "synonyms": ["FPL", "Florida Power and Light"]
+    },
+    {
+      "value": "GCPD",
+      "synonyms": ["GCPD", "Public Utility District Number 2 of Grant County, Washington", "Grant County PUD", "Grant County"]
+    },
+    {
+      "value": "GRID",
+      "synonyms": ["GRID", "Gridforce Energy Management", "Gridforce"]
+    },
+    {
+      "value": "GVL",
+      "synonyms": ["GVL", "Gainesville Regional Utilities", "Gainesville"]
+    },
+    {
+      "value": "GWA",
+      "synonyms": ["GWA", "NaturEner Power Watch"]
+    },
+    {
+      "value": "HST",
+      "synonyms": ["HST", "City of Homestead", "Homestead"]
+    },
+    {
+      "value": "IID",
+      "synonyms": ["IID", "Imperial Irrigation District"]
+    },
+    {
+      "value": "IPCO",
+      "synonyms": ["IPCO", "Idaho Power Company", "Idaho Power", "Idaho"]
+    },
+    {
+      "value": "JEA",
+      "synonyms": ["JEA"]
+    },
+    {
+      "value": "LDWP",
+      "synonyms": ["LDWP", "Los Angeles Department of Water and Power", "LA Department of Water and Power", "LA", "Los Angeles"]
+    },
+    {
+      "value": "LGEE",
+      "synonyms": ["LGEE", "LG and E", "LGE", "Louisville Gas and Electric", "Louisville"]
+    },
+    {
+      "value": "NEVP",
+      "synonyms": ["NEVP", "Nevada Power Company", "Nevada Power", "Nevada"]
+    },
+    {
+      "value": "NWMT",
+      "synonyms": ["NWMT", "NorthWestern Corporation", "NorthWestern"]
+    },
+    {
+      "value": "PACE",
+      "synonyms": ["PACE", "PacifiCorp East"]
+    },
+    {
+      "value": "PACW",
+      "synonyms": ["PACW", "PacifiCorp West"]
+    },
+    {
+      "value": "PGE",
+      "synonyms": ["PGE", "Portland General Electric Company", "Portland General Electric", "Portland"]
+    },
+    {
+      "value": "PNM",
+      "synonyms": ["PNM", "Public Service Company of New Mexico", "Public Service New Mexico", "New Mexico"]
+    },
+    {
+      "value": "PSCO",
+      "synonyms": ["PSCO", "Public Service Company of Colorado", "Public Service Colorado", "Colorado"]
+    },
+    {
+      "value": "PSEI",
+      "synonyms": ["PSEI", "Puget Sound Energy"]
+    },
+    {
+      "value": "SC",
+      "synonyms": ["SC", "South Carolina Public Service Authority", "South Carolina"]
+    },
+    {
+      "value": "SCEG",
+      "synonyms": ["SCEG", "Dominion Energy South Carolina", "Dominion South Carolina"]
+    },
+    {
+      "value": "SCL",
+      "synonyms": ["SCL", "Seattle City Light", "Seattle"]
+    },
+    {
+      "value": "SEC",
+      "synonyms": ["SEC", "Seminole Electric Cooperative"]
+    },
+    {
+      "value": "SEPA",
+      "synonyms": ["SEPA", "Southeastern Power Administration"]
+    },
+    {
+      "value": "SIKE",
+      "synonyms": ["SIKE", "Sikeston Board of Municipal Utilities", "Sikeston"]
+    },
+    {
+      "value": "SOCO",
+      "synonyms": ["SOCO", "Southern Company"]
+    },
+    {
+      "value": "SPA",
+      "synonyms": ["SPA", "Southwestern Power Administration"]
+    },
+    {
+      "value": "SRP",
+      "synonyms": ["SRP", "Salt River Project"]
+    },
+    {
+      "value": "SWPP",
+      "synonyms": ["SWPP", "Southwest Power Pool"]
+    },
+    {
+      "value": "TAL",
+      "synonyms": ["TAL", "Tallahassee"]
+    },
+    {
+      "value": "TEC",
+      "synonyms": ["TEC", "Tampa Electric", "Tampa"]
+    },
+    {
+      "value": "TEPC",
+      "synonyms": ["TEPC", "Tucson Electric Power", "Tucson"]
+    },
+    {
+      "value": "TIDC",
+      "synonyms": ["TIDC", "Turlock Irrigation District", "Turlock"]
+    },
+    {
+      "value": "TPWR",
+      "synonyms": ["TPWR", "Tacoma Power", "Tacoma"]
+    },
+    {
+      "value": "TVA",
+      "synonyms": ["TVA", "Tennessee Valley Authority", "Tennessee"]
+    },
+    {
+      "value": "WACM",
+      "synonyms": ["WACM", "Western Area Power Administration Rocky Mountain Region", "Western Area Power Administration Rockies", "WAPA Rockies"]
+    },
+    {
+      "value": "WALC",
+      "synonyms": ["WALC", "Western Area Power Administration Desert Southwest Region", "Western Area Power Administration Desert Southwest", "WAPA Southwest", "WAPA Desert Southwest"]
+    },
+    {
+      "value": "WAUW",
+      "synonyms": ["WAUW", "Western Area Power Administration Upper Great Plains West", "WAPA Great Plains", "WAPA Upper Great Plains"]
+    },
+    {
+      "value": "WWA",
+      "synonyms": ["WWA", "NaturEner Wind Watch"]
+    },
+    {
+      "value": "YAD",
+      "synonyms": ["YAD", "Alcoa", "Yadkin"]
+    }
+  ]
+}
