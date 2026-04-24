@@ -170,9 +170,28 @@
                             speakCheckbox.checked &&
                             fulfillmentText
                         ) {
-                            window.speechSynthesis.speak(
-                                new SpeechSynthesisUtterance(fulfillmentText),
+                            const getVoices = () =>
+                                new Promise((resolve) => {
+                                    const voices =
+                                        window.speechSynthesis.getVoices();
+                                    if (voices.length) {
+                                        resolve(voices);
+                                        return;
+                                    }
+                                    window.speechSynthesis.onvoiceschanged =
+                                        () =>
+                                            resolve(
+                                                window.speechSynthesis.getVoices(),
+                                            );
+                                });
+                            let utterance = new SpeechSynthesisUtterance(
+                                fulfillmentText,
                             );
+                            utterance.voice =
+                                (await getVoices()).find(
+                                    (v) => v.name === "Google US English",
+                                ) || null;
+                            window.speechSynthesis.speak(utterance);
                         }
                     }
 
