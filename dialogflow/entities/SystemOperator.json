@@ -1,12 +1,6 @@
 {
-  "id": "system-operator-entity-001",
   "name": "SystemOperator",
-  "isOverridable": true,
-  "isEnum": false,
-  "isRegexp": false,
-  "automatedExpansion": false,
-  "allowFuzzyExtraction": false,
-  "entities": [
+  "entries": [
     {
       "value": "ERCOT",
       "synonyms": ["ERCOT", "Texas"]
@@ -53,7 +47,12 @@
     },
     {
       "value": "AZPS",
-      "synonyms": ["AZPS", "Arizona Public Service Company", "Arizona Public Service", "Arizona"]
+      "synonyms": [
+        "AZPS",
+        "Arizona Public Service Company",
+        "Arizona Public Service",
+        "Arizona"
+      ]
     },
     {
       "value": "BANC",
@@ -65,7 +64,11 @@
     },
     {
       "value": "CHPD",
-      "synonyms": ["CHPD", "Public Utility District Number 1 of Chelan County", "Chelan County PUD"]
+      "synonyms": [
+        "CHPD",
+        "Public Utility District Number 1 of Chelan County",
+        "Chelan County PUD"
+      ]
     },
     {
       "value": "CPLE",
@@ -81,7 +84,12 @@
     },
     {
       "value": "DOPD",
-      "synonyms": ["DOPD", "PUD Number 1 of Douglas County", "Douglas County PUD", "Douglas County"]
+      "synonyms": [
+        "DOPD",
+        "PUD Number 1 of Douglas County",
+        "Douglas County PUD",
+        "Douglas County"
+      ]
     },
     {
       "value": "DUK",
@@ -89,7 +97,12 @@
     },
     {
       "value": "EPE",
-      "synonyms": ["EPE", "El Paso Electric Company", "El Paso Electric", "El Paso"]
+      "synonyms": [
+        "EPE",
+        "El Paso Electric Company",
+        "El Paso Electric",
+        "El Paso"
+      ]
     },
     {
       "value": "FMPP",
@@ -105,7 +118,12 @@
     },
     {
       "value": "GCPD",
-      "synonyms": ["GCPD", "Public Utility District Number 2 of Grant County, Washington", "Grant County PUD", "Grant County"]
+      "synonyms": [
+        "GCPD",
+        "Public Utility District Number 2 of Grant County, Washington",
+        "Grant County PUD",
+        "Grant County"
+      ]
     },
     {
       "value": "GRID",
@@ -137,11 +155,23 @@
     },
     {
       "value": "LDWP",
-      "synonyms": ["LDWP", "Los Angeles Department of Water and Power", "LA Department of Water and Power", "LA", "Los Angeles"]
+      "synonyms": [
+        "LDWP",
+        "Los Angeles Department of Water and Power",
+        "LA Department of Water and Power",
+        "LA",
+        "Los Angeles"
+      ]
     },
     {
       "value": "LGEE",
-      "synonyms": ["LGEE", "LG and E", "LGE", "Louisville Gas and Electric", "Louisville"]
+      "synonyms": [
+        "LGEE",
+        "LG and E",
+        "LGE",
+        "Louisville Gas and Electric",
+        "Louisville"
+      ]
     },
     {
       "value": "NEVP",
@@ -161,15 +191,30 @@
     },
     {
       "value": "PGE",
-      "synonyms": ["PGE", "Portland General Electric Company", "Portland General Electric", "Portland"]
+      "synonyms": [
+        "PGE",
+        "Portland General Electric Company",
+        "Portland General Electric",
+        "Portland"
+      ]
     },
     {
       "value": "PNM",
-      "synonyms": ["PNM", "Public Service Company of New Mexico", "Public Service New Mexico", "New Mexico"]
+      "synonyms": [
+        "PNM",
+        "Public Service Company of New Mexico",
+        "Public Service New Mexico",
+        "New Mexico"
+      ]
     },
     {
       "value": "PSCO",
-      "synonyms": ["PSCO", "Public Service Company of Colorado", "Public Service Colorado", "Colorado"]
+      "synonyms": [
+        "PSCO",
+        "Public Service Company of Colorado",
+        "Public Service Colorado",
+        "Colorado"
+      ]
     },
     {
       "value": "PSEI",
@@ -177,11 +222,19 @@
     },
     {
       "value": "SC",
-      "synonyms": ["SC", "South Carolina Public Service Authority", "South Carolina"]
+      "synonyms": [
+        "SC",
+        "South Carolina Public Service Authority",
+        "South Carolina"
+      ]
     },
     {
       "value": "SCEG",
-      "synonyms": ["SCEG", "Dominion Energy South Carolina", "Dominion South Carolina"]
+      "synonyms": [
+        "SCEG",
+        "Dominion Energy South Carolina",
+        "Dominion South Carolina"
+      ]
     },
     {
       "value": "SCL",
@@ -241,15 +294,31 @@
     },
     {
       "value": "WACM",
-      "synonyms": ["WACM", "Western Area Power Administration Rocky Mountain Region", "Western Area Power Administration Rockies", "WAPA Rockies"]
+      "synonyms": [
+        "WACM",
+        "Western Area Power Administration Rocky Mountain Region",
+        "Western Area Power Administration Rockies",
+        "WAPA Rockies"
+      ]
     },
     {
       "value": "WALC",
-      "synonyms": ["WALC", "Western Area Power Administration Desert Southwest Region", "Western Area Power Administration Desert Southwest", "WAPA Southwest", "WAPA Desert Southwest"]
+      "synonyms": [
+        "WALC",
+        "Western Area Power Administration Desert Southwest Region",
+        "Western Area Power Administration Desert Southwest",
+        "WAPA Southwest",
+        "WAPA Desert Southwest"
+      ]
     },
     {
       "value": "WAUW",
-      "synonyms": ["WAUW", "Western Area Power Administration Upper Great Plains West", "WAPA Great Plains", "WAPA Upper Great Plains"]
+      "synonyms": [
+        "WAUW",
+        "Western Area Power Administration Upper Great Plains West",
+        "WAPA Great Plains",
+        "WAPA Upper Great Plains"
+      ]
     },
     {
       "value": "WWA",
