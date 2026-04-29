@@ -103,7 +103,7 @@ Set the following environment variables:
 |---------------------------------------|-------------------------------------------------------------------------|
 | `GRIDSTATUS_API_KEY`                  | Your GridStatus.io API key                                              |
 | `DIALOGFLOW_PROJECT_ID`               | Your Google Cloud project ID (visible in the Dialogflow agent settings) |
-| `DIALOGFLOW_SERVICE_CREDENTIALS_JSON` | Your Google Cloud service account credentials JSON file                 |
+| `DIALOGFLOW_SERVICE_CREDENTIALS_JSON` | The contents of your Google Cloud service account credentials JSON file |
 
 then run the app:
 
